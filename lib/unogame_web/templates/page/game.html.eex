@@ -1,0 +1,8 @@
+<div class="row">
+  <div class="column">
+    <h2>Uno</h2>
+    <div id="root">
+      React app loading...
+    </div>
+  </div>
+</div>

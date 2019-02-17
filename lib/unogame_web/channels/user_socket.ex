@@ -2,7 +2,7 @@ defmodule UnogameWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", UnogameWeb.RoomChannel
+  channel "games:*", UnogameWeb.GamesChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
