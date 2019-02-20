@@ -76,7 +76,7 @@ class UnoGame extends React.Component {
             <Face face={this.state.face_up} />
           </div>
           <div className="column">
-            <img src={'./static/images/UNO-Back.png'}
+            <img src='/images/UNO-Back.png'
                       onClick={() => this.on_draw.bind(this)} />
           </div>
         </div>
