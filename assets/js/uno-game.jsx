@@ -40,15 +40,15 @@ class UnoGame extends React.Component {
 
   drawCard() {
     this.channel.push("draw_card", { playerid: this.playerid })
-        .receive("ok", (resp) => { this.setState(resp.game); 
-      console.log("draw_card...");
-      console.log(resp.game); });
+        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
+        .receive("error", resp => { console.log("Unable to draw card", resp) }); 
   }
 
   playCard() {
     let card = this.state.player_hands[this.playerid][0];
     this.channel.push("play_card", { playerid: this.playerid, card: card})
-        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); });
+        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
+        .receive("error", resp => { console.log("Unable to play card", resp) }); 
   }
 
   render() {

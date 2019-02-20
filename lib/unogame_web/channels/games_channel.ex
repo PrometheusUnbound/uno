@@ -44,21 +44,29 @@ defmodule UnogameWeb.GamesChannel do
     {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
   end
   def handle_in("draw_card", %{"playerid" => playerid}, socket) do
-    name = socket.assigns[:name]
-    game = Game.draw_card(BackupAgent.get(name), playerid)
-    socket = socket
-    |> assign(:game, game)
-    BackupAgent.put(name, game)
-    {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
+    try do
+      name = socket.assigns[:name]
+      game = Game.draw_card(BackupAgent.get(name), playerid)
+      socket = socket
+      |> assign(:game, game)
+      BackupAgent.put(name, game)
+      {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
+    rescue
+      e in ArgumentError -> {:reply, {:error, %{reason: e.message}}, socket}
+    end
   end
   # card should be in the format of [color, value]
   def handle_in("play_card", %{"playerid" => playerid, "card" => card}, socket) do
-    name = socket.assigns[:name]
-    game = Game.play_card(BackupAgent.get(name), playerid, card)
-    socket = socket
-    |> assign(:game, game)
-    BackupAgent.put(name, game)
-    {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
+    try do
+      name = socket.assigns[:name]
+      game = Game.play_card(BackupAgent.get(name), playerid, card)
+      socket = socket
+      |> assign(:game, game)
+      BackupAgent.put(name, game)
+      {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
+    rescue
+      e in ArgumentError -> {:reply, {:error, %{reason: e.message}}, socket}
+    end
   end
 
   defp authorized?(_payload) do

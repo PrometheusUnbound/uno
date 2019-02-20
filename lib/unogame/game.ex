@@ -23,7 +23,6 @@ defmodule Unogame.Game do
     yellow_cards = gen_color_cards("yellow")
     special_cards = gen_special_cards()
 
-
     Enum.concat(blue_cards, green_cards)
     |> Enum.concat(red_cards)
     |> Enum.concat(yellow_cards)
@@ -100,6 +99,10 @@ defmodule Unogame.Game do
     rem(game.next_player_ind + game.direction, length(game.player_ids))
   end
 
+  defp player_turn?(game, playerid) do
+    playerid == Enum.at(game.player_ids, game.next_player_ind)
+  end
+
   defp next_turn(game) do
     IO.puts("to next player...")
     
@@ -136,9 +139,15 @@ defmodule Unogame.Game do
     end
   end
   def draw_card(game, playerid) do
-    game
-    |> draw_card_to_hand(playerid)
-    |> next_turn
+    if !player_turn?(game, playerid) do
+      IO.puts("not your turn...")
+       raise ArgumentError, message: "not turn of player " <> Integer.to_string(playerid)
+      game
+    else
+      game
+      |> draw_card_to_hand(playerid)
+      |> next_turn
+    end
   end
 
   defp draw_two_played(game, playerid) do
@@ -196,19 +205,24 @@ defmodule Unogame.Game do
   end
   # for now, do not allow cards to stack (eg: deflecting draw-2 with draw-2)
   def play_card(game, playerid, card) do
-    # TODO validate playerid turn
-    game = game
-    |> move_from_hand_to_pile(playerid, card)
+    if !player_turn?(game, playerid) do
+      IO.puts("not your turn...")
+      raise ArgumentError, message: "not turn of player " <> Integer.to_string(playerid)
+      game
+    else 
+      game = game
+      |> move_from_hand_to_pile(playerid, card)
 
-    case Enum.at(card, 1) do
-      "draw-2" -> draw_two_played(game, playerid) |> next_turn
-      "draw-4-wild" -> wild_draw_four_played(game, playerid, card) |> next_turn
-      "reverse" -> reverse_played(game) |> next_turn
-      "skip" -> skip_played(game) |> next_turn
-      "wild" -> wild_played(game, playerid, card) |> next_turn
-      _ -> game |> next_turn
+      case Enum.at(card, 1) do
+        "draw-2" -> draw_two_played(game, playerid) |> next_turn
+        "draw-4-wild" -> wild_draw_four_played(game, playerid, card) |> next_turn
+        "reverse" -> reverse_played(game) |> next_turn
+        "skip" -> skip_played(game) |> next_turn
+        "wild" -> wild_played(game, playerid, card) |> next_turn
+        _ -> game |> next_turn
+      end
+      # TODO handle last card -- game over? or player no longer active
     end
-    # TODO handle last card -- game over? or player no longer active
   end
 
 end
