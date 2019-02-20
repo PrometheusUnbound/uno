@@ -46,8 +46,8 @@ class UnoGame extends React.Component {
   }
 
   playCard() {
-    let card = this.state.player_hands[playerid][0];
-    this.channel.push("play_card", { playerid: playerid, card: card})
+    let card = this.state.player_hands[this.playerid][0];
+    this.channel.push("play_card", { playerid: this.playerid, card: card})
         .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); });
   }
 

@@ -53,7 +53,7 @@ defmodule UnogameWeb.GamesChannel do
   end
   # card should be in the format of [color, value]
   def handle_in("play_card", %{"playerid" => playerid, "card" => card}, socket) do
-    name = socket.assign[:name]
+    name = socket.assigns[:name]
     game = Game.play_card(BackupAgent.get(name), playerid, card)
     socket = socket
     |> assign(:game, game)
