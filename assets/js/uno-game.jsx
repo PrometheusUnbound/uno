@@ -14,9 +14,7 @@ class UnoGame extends React.Component {
       playerid: -1,
       hand: [],
       opp_hands: [],
-      deck: [],
       face_up: [],
-      turn: true,
     }
 
   this.channel = props.channel;
@@ -33,40 +31,65 @@ class UnoGame extends React.Component {
   }
 
   on_play(ev){
-    if turn {
-      if (ev.target.value[0] == face_up[0]) ||
-          (ev.target.value[1] == face_up[1]) ||
-          (ev.target.value[0] == "W" ) ||
-          (ev.target.value[0] == "W+4"){
-        this.setState({turn: false})
-        this.channel.push("play_card", { playerid: playerid },
-        { card: ev.target.value })
+    this.channel.push("play_card", { playerid: playerid },
+    { card: ev.target.value })
         .receive("ok", this.got_view.bind(this));
-      }
-      else {
-        alert("Not a legal play!");
-      }
-    }
-    else {
-      alert("Not your turn!");
-    }
   }
 
   on_draw(ev){
-    if turn {
-      this.channel.push("draw_card", { playerid: playerid })
-        .recieve("ok", this.got_view.bind(this));
+    this.channel.push("draw_card", { playerid: playerid })
+      .recieve("ok", this.got_view.bind(this));
+  }
+
+  on_uno(){
+    this.channel.push("uno?", { hand: hand })
+      .recieve("ok", this.got_view.bind(this))
+  }
+
+  creatHand(){
+    let table = [];
+    for(let i = 0; j < 1; j++){
+      let children = [];
+      for(let j = 0; i < hand.length; j++) {
+        children.push(<td>{'${hand[j][0] + " " + hand[j][1]'}</td>);
+      }
+      table.push(<tr>{children}</tr>);
     }
-    else {
-      alert("Not your turn!");
-    }
+    return table;
   }
 
 
 
 
   render() {
-    return <h1>Hello World</h1>
+    let uno_button = <button class="button uno" onClick={() => this.on_uno()}>
+                      UNO!</button>
+    return (
+      <div>
+        <div className="row">
+          <div className="column">
+            {uno_button}
+          </div>
+        </div>
+        <div className="row">
+          <div className="column">
+            <Face face={this.state.face_up} />
+          </div>
+          <div className="column">
+            <img src={'./images/UNO-Back.png'}
+                      onClick={() => this.on_draw.bind(this)} />
+          </div>
+        </div>
+      </div>
+    )
   }
+}
 
+function Face(params) {
+  let {face} = params;
+  return (
+    <div>
+      <p><b>The Deck</b></p>
+    </div>
+  );
 }
