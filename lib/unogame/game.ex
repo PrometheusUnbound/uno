@@ -23,7 +23,6 @@ defmodule Unogame.Game do
     yellow_cards = gen_color_cards("yellow")
     special_cards = gen_special_cards()
 
-
     Enum.concat(blue_cards, green_cards)
     |> Enum.concat(red_cards)
     |> Enum.concat(yellow_cards)
@@ -41,7 +40,7 @@ defmodule Unogame.Game do
       next_player_ind: 0,
       num_players: 0,
       player_hands: %{},
-      player_ids: [1, 2, 3, 4], # TODO, update player_ids
+      player_ids: [], 
       deck: gen_all_cards()
     }
   end
@@ -53,8 +52,26 @@ defmodule Unogame.Game do
       deck: game.deck, # TODO remove
       discard_pile: game.discard_pile, # TODO replace with top card in discard_pile,
       player_hands: game.player_hands,
-      current_player_ind: game.next_player_ind # TODO remove
+      current_player_ind: game.next_player_ind, # TODO remove
+      player_ids: game.player_ids # TODO remove
     }
+  end
+
+  # add playerid to the given game
+  def join_game(game, playerid) do
+    IO.puts("join game")
+    if not Enum.member?(game.player_ids, playerid) do
+      game 
+      |> Map.put(:player_ids, [playerid | game.player_ids])
+    else
+      game
+    end
+  end
+
+  # are there enough players to start the game?
+  def is_ready?(game) do
+    min_num_players = 4
+    length(game.player_ids) >= min_num_players 
   end
 
   defp deal_cards(game, []), do: game
@@ -80,6 +97,10 @@ defmodule Unogame.Game do
 
   defp next_player_ind(game) do
     rem(game.next_player_ind + game.direction, length(game.player_ids))
+  end
+
+  defp player_turn?(game, playerid) do
+    playerid == Enum.at(game.player_ids, game.next_player_ind)
   end
 
   defp next_turn(game) do
@@ -118,9 +139,15 @@ defmodule Unogame.Game do
     end
   end
   def draw_card(game, playerid) do
-    game
-    |> draw_card_to_hand(playerid)
-    |> next_turn
+    if !player_turn?(game, playerid) do
+      IO.puts("not your turn...")
+       raise ArgumentError, message: "not turn of player " <> Integer.to_string(playerid)
+      game
+    else
+      game
+      |> draw_card_to_hand(playerid)
+      |> next_turn
+    end
   end
 
   defp draw_two_played(game, playerid) do
@@ -178,18 +205,24 @@ defmodule Unogame.Game do
   end
   # for now, do not allow cards to stack (eg: deflecting draw-2 with draw-2)
   def play_card(game, playerid, card) do
-    game = game
-    |> move_from_hand_to_pile(playerid, card)
+    if !player_turn?(game, playerid) do
+      IO.puts("not your turn...")
+      raise ArgumentError, message: "not turn of player " <> Integer.to_string(playerid)
+      game
+    else 
+      game = game
+      |> move_from_hand_to_pile(playerid, card)
 
-    case Enum.at(card, 1) do
-      "draw-2" -> draw_two_played(game, playerid) |> next_turn
-      "draw-4-wild" -> wild_draw_four_played(game, playerid, card) |> next_turn
-      "reverse" -> reverse_played(game) |> next_turn
-      "skip" -> skip_played(game) |> next_turn
-      "wild" -> wild_played(game, playerid, card) |> next_turn
-      _ -> game |> next_turn
+      case Enum.at(card, 1) do
+        "draw-2" -> draw_two_played(game, playerid) |> next_turn
+        "draw-4-wild" -> wild_draw_four_played(game, playerid, card) |> next_turn
+        "reverse" -> reverse_played(game) |> next_turn
+        "skip" -> skip_played(game) |> next_turn
+        "wild" -> wild_played(game, playerid, card) |> next_turn
+        _ -> game |> next_turn
+      end
+      # TODO handle last card -- game over? or player no longer active
     end
-    # TODO handle last card -- game over? or player no longer active
   end
 
 end

@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import _ from "lodash";
 
 //Export default/channel set up
-export default function game_init(root, channel) {
-  ReactDOM.render(<UnoGame channel={channel} />, root);
+export default function game_init(root, channel, playerid) {
+  ReactDOM.render(<UnoGame channel={channel} playerid={playerid} />, root);
 }
 
 class UnoGame extends React.Component {
@@ -13,10 +13,23 @@ class UnoGame extends React.Component {
 
     this.channel = props.channel;
 
+    this.playerid = props.playerid; 
+    console.log("playerid: " + this.playerid);
+
+    this.channel.on("game_ready", payload => {this.getGame()});
+  
     this.channel
         .join()
         .receive("ok", this.set_view.bind(this))
         .receive("error", resp => { console.log("Unable to join", resp) });
+  }
+
+  getGame() {
+    this.channel.push("get_game", {})
+      .receive("ok", (resp) => { this.setState(resp.game);
+      console.log("get_game...");
+      console.log(resp.game); });
+
   }
 
   set_view(view) {
@@ -26,18 +39,16 @@ class UnoGame extends React.Component {
   }
 
   drawCard() {
-    this.channel.push("draw_card", { playerid: 1 })
-        .receive("ok", (resp) => { this.setState(resp.game); 
-      console.log("draw_card...");
-      console.log(resp.game); });
+    this.channel.push("draw_card", { playerid: this.playerid })
+        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
+        .receive("error", resp => { console.log("Unable to draw card", resp) }); 
   }
 
   playCard() {
-    let card = this.state.player_hands[1][0];
-    console.log("player hands...");
-    console.log(this.state.player_hands[1]);
-    this.channel.push("play_card", { playerid: 1, card: card})
-        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); });
+    let card = this.state.player_hands[this.playerid][0];
+    this.channel.push("play_card", { playerid: this.playerid, card: card})
+        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
+        .receive("error", resp => { console.log("Unable to play card", resp) }); 
   }
 
   render() {
