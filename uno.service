@@ -1,0 +1,16 @@
+[Unit]
+Description=Uno Game 
+
+[Service]
+Type=simple
+User=uno
+Group=uno
+Restart=on-failure
+Environment=MIX_ENV=prod "PORT=4793"
+Environment=LANG=en_US.UTF-8
+
+WorkingDirectory=/home/uno/uno
+ExecStart=/home/uno/uno/start.sh
+
+[Install]
+WantedBy=multi-user.target
