@@ -41,7 +41,7 @@ defmodule Unogame.Game do
       next_player_ind: 0,
       num_players: 0,
       player_hands: %{},
-      player_ids: [1, 2, 3, 4], # TODO, update player_ids
+      player_ids: [], 
       deck: gen_all_cards()
     }
   end
@@ -53,8 +53,26 @@ defmodule Unogame.Game do
       deck: game.deck, # TODO remove
       discard_pile: game.discard_pile, # TODO replace with top card in discard_pile,
       player_hands: game.player_hands,
-      current_player_ind: game.next_player_ind # TODO remove
+      current_player_ind: game.next_player_ind, # TODO remove
+      player_ids: game.player_ids # TODO remove
     }
+  end
+
+  # add playerid to the given game
+  def join_game(game, playerid) do
+    IO.puts("join game")
+    if not Enum.member?(game.player_ids, playerid) do
+      game 
+      |> Map.put(:player_ids, [playerid | game.player_ids])
+    else
+      game
+    end
+  end
+
+  # are there enough players to start the game?
+  def is_ready?(game) do
+    min_num_players = 4
+    length(game.player_ids) >= min_num_players 
   end
 
   defp deal_cards(game, []), do: game
@@ -178,6 +196,7 @@ defmodule Unogame.Game do
   end
   # for now, do not allow cards to stack (eg: deflecting draw-2 with draw-2)
   def play_card(game, playerid, card) do
+    # TODO validate playerid turn
     game = game
     |> move_from_hand_to_pile(playerid, card)
 

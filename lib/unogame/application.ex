@@ -9,9 +9,10 @@ defmodule Unogame.Application do
     # List all child processes to be supervised
     children = [
       # Start the endpoint when the application starts
-      UnogameWeb.Endpoint
+      UnogameWeb.Endpoint,
       # Starts a worker by calling: Unogame.Worker.start_link(arg)
       # {Unogame.Worker, arg},
+      Unogame.BackupAgent
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
