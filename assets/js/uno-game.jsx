@@ -62,7 +62,7 @@ class UnoGame extends React.Component {
 
 
   render() {
-    let uno_button = <button class="button uno" onClick={() => this.on_uno()}>
+    let uno_button = <button className="button uno" onClick={() => this.on_uno()}>
                       UNO!</button>
     return (
       <div>
@@ -76,7 +76,7 @@ class UnoGame extends React.Component {
             <Face face={this.state.face_up} />
           </div>
           <div className="column">
-            <img src={'./images/UNO-Back.png'}
+            <img src={'./static/images/UNO-Back.png'}
                       onClick={() => this.on_draw.bind(this)} />
           </div>
         </div>
