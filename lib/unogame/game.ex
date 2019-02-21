@@ -38,7 +38,6 @@ defmodule Unogame.Game do
       direction: 1, # 1 is forwards, -1 is backwards
       discard_pile: [],
       next_player_ind: 0,
-      num_players: 0,
       player_hands: %{},
       player_ids: [], 
       deck: gen_all_cards()
@@ -48,7 +47,14 @@ defmodule Unogame.Game do
   # TODO pass in player id here?
   def client_view(game) do
     %{
-      num_players: game.num_players,
+      num_players: length(game.player_ids)
+    }
+  end
+  def client_view(game, playerid) do
+    %{
+      num_players: length(game.player_ids),
+      face_up_card: (hd game.discard_pile),
+      player_hand: game.player_hands[playerid],
       deck: game.deck, # TODO remove
       discard_pile: game.discard_pile, # TODO replace with top card in discard_pile,
       player_hands: game.player_hands,
