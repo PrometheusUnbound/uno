@@ -17,7 +17,8 @@ class UnoGame extends React.Component {
     console.log("playerid: " + this.playerid);
 
     this.channel.on("game_ready", payload => {this.getGame()});
-  
+    this.channel.on("game_over", payload => {this.gameOver()});
+
     this.channel
         .join()
         .receive("ok", this.set_view.bind(this))
@@ -29,7 +30,10 @@ class UnoGame extends React.Component {
       .receive("ok", (resp) => { this.setState(resp.game);
       console.log("get_game...");
       console.log(resp.game); });
+  }
 
+  gameOver() {
+    alert("game over");
   }
 
   set_view(view) {

@@ -63,6 +63,11 @@ defmodule UnogameWeb.GamesChannel do
       socket = socket
       |> assign(:game, game)
       BackupAgent.put(name, game)
+
+      if Game.game_over?(game) do
+        IO.puts("game over")
+        broadcast(socket, "game_over", %{})
+      end
       {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
     rescue
       e in ArgumentError -> {:reply, {:error, %{reason: e.message}}, socket}
