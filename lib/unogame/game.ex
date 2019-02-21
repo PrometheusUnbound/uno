@@ -68,6 +68,17 @@ defmodule Unogame.Game do
     end
   end
 
+  # is the game over -- does one of the players have 0 cards?
+  def game_over?(game) do
+    player_hands = Map.values(game.player_hands)
+    Enum.any?(player_hands, fn hand -> hand == [] end)
+  end
+
+  # has the game already started?
+  def game_started?(game) do
+    game.discard_pile != []
+  end
+
   # are there enough players to start the game?
   def is_ready?(game) do
     min_num_players = 4

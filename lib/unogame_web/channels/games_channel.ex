@@ -7,20 +7,24 @@ defmodule UnogameWeb.GamesChannel do
   def join("games:" <> name, payload, socket) do
     if authorized?(payload) do
       playerid = payload["playerid"]
-      IO.puts(playerid)
       game = BackupAgent.get(name) || Game.new()
-      game = game
-      |> Game.join_game(playerid)
+      if Game.game_started?(game) do
+        {:error, %{reason: "game already in progress"}}
+      else
+        game = game
+        |> Game.join_game(playerid)
 
-      socket = socket
-      |> assign(:game, game)
+        socket = socket
+        |> assign(:game, game)
+        |> assign(:name, name)
+      
+        BackupAgent.put(name, game)
 
-      if Game.is_ready?(game) do
-        send(self(), :game_ready)
+        if Game.is_ready?(game) do
+          send(self(), :game_ready)
+        end
+        {:ok, %{"game" => Game.client_view(game)}, socket}
       end
-
-      BackupAgent.put(name, game)
-      {:ok, %{"game" => Game.client_view(game)}, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
@@ -39,8 +43,6 @@ defmodule UnogameWeb.GamesChannel do
   def handle_in("get_game", _payload, socket) do
     name = socket.assigns[:name]
     game = BackupAgent.get(name)
-    socket = socket
-    |> assign(:game, game)
     {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
   end
   def handle_in("draw_card", %{"playerid" => playerid}, socket) do
@@ -63,6 +65,12 @@ defmodule UnogameWeb.GamesChannel do
       socket = socket
       |> assign(:game, game)
       BackupAgent.put(name, game)
+
+      if Game.game_over?(game) do
+        IO.puts("game over")
+        BackupAgent.put(name, nil) # clear game from BackupAgent
+        broadcast(socket, "game_over", %{})
+      end
       {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
     rescue
       e in ArgumentError -> {:reply, {:error, %{reason: e.message}}, socket}
