@@ -1,0 +1,17 @@
+#deck {
+  height: 150px;
+  width: 100px;
+}
+#deck:hover {
+  cursor: pointer;
+}
+#deck:active {
+  opacity: 0.7;
+}
+
+.card-hand:hover {
+  cursor: pointer;
+}
+.card-hand:active {
+  opacity: 0.7;
+} 
