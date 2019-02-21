@@ -28,7 +28,7 @@ class UnoGame extends React.Component {
     this.channel
         .join()
         .receive("ok", this.got_view.bind(this))
-        .receive("error", resp => { console.log("Unable to join", resp) });
+        .receive("error", resp => { console.log("Unable to join", resp); this.isGameAlreadyInProgress = true; this.setState({}) });
   }
 
   getGame() {
@@ -67,6 +67,27 @@ class UnoGame extends React.Component {
       .recieve("ok", this.got_view.bind(this))
   }
 
+  playCard(card) {
+    //let card = this.state.player_hands[this.playerid][0];
+    this.channel.push("play_card", { playerid: this.playerid, card: card})
+        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
+        .receive("error", resp => { console.log("Unable to play card", resp) }); 
+  }
+
+  renderWaiting() {
+    return (<div className="row">
+        <h3>Waiting for more players to join...</h3>
+      </div>);
+  }
+
+  renderGameAlreadyInProgress() {   
+    return (<div>
+        <h3>Game is already in progress...</h3>
+        <br />
+        <a href="/">Go back</a>
+      </div>);
+  }    
+       
   createHand() {
 /*    let table = [];
     for(let i = 0; j < 1; j++){
@@ -95,6 +116,13 @@ class UnoGame extends React.Component {
   }
 
   render() {
+
+    if (this.isGameAlreadyInProgress) {
+      return this.renderGameAlreadyInProgress();
+    } else if (!this.state.has_game_started) {
+      return this.renderWaiting();
+    }
+
     let hand = this.createHand();
     let faceUp = this.state.face_up_card.length != 0 ? <Card className="faceup" color={this.state.face_up_card[0]} value={this.state.face_up_card[1]} /> : [];
     let uno_button = <button className="button uno" onClick={() => this.on_uno()}>
@@ -120,12 +148,6 @@ class UnoGame extends React.Component {
     )
   }
  
-  playCard(card) {
-    //let card = this.state.player_hands[this.playerid][0];
-    this.channel.push("play_card", { playerid: this.playerid, card: card})
-        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
-        .receive("error", resp => { console.log("Unable to play card", resp) }); 
-  }
 }
 
 function Face(params) {
