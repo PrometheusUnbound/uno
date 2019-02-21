@@ -74,6 +74,11 @@ defmodule Unogame.Game do
     Enum.any?(player_hands, fn hand -> hand == [] end)
   end
 
+  # has the game already started?
+  def game_started?(game) do
+    game.discard_pile != []
+  end
+
   # are there enough players to start the game?
   def is_ready?(game) do
     min_num_players = 4
