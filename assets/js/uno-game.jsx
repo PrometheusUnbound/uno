@@ -82,16 +82,21 @@ class UnoGame extends React.Component {
     for (let i = 0; i < this.state.player_hand.length; i++) {
       console.log("render card...");
       let card = this.state.player_hand[i];
-      hand.push(<Card color={card[0]} value={card[1]} onClick={() => {this.playCard(card)}} />);
+      hand.push(<Card className="column card-hand" color={card[0]} value={card[1]} onClick={() => {this.playCard(card)}} />);
     }
 
-    return (<div className="row">
-        {hand}
+    return (<div className="hand">
+        <b>Your hand:</b>
+        <br />
+        <div className="row">
+          {hand}
+        </div>
       </div>); 
   }
 
   render() {
     let hand = this.createHand();
+    let faceUp = this.state.face_up_card.length != 0 ? <Card className="faceup" color={this.state.face_up_card[0]} value={this.state.face_up_card[1]} /> : [];
     let uno_button = <button className="button uno" onClick={() => this.on_uno()}>
                       UNO!</button>
     return (
@@ -103,7 +108,7 @@ class UnoGame extends React.Component {
         </div>
         <div className="row">
           <div className="column">
-            <Face face={this.state.face_up_card} />
+            {faceUp}
           </div>
           <div className="column">
             <img id="deck" src='/images/UNO-Back.png'
@@ -133,7 +138,7 @@ function Face(params) {
 }
 
 const Card = function(props) {
-  return <div className="column card-hand" onClick={props.onClick}>
+  return <div className={props.className} onClick={props.onClick}>
       {props.color + " " + props.value}
     </div>
 }
