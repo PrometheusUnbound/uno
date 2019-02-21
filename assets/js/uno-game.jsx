@@ -24,6 +24,7 @@ class UnoGame extends React.Component {
 
     this.channel.on("game_ready", payload => {this.getGame()});
     this.channel.on("game_over", payload => {this.gameOver()});
+    this.channel.on("update_game", payload => {this.getGame()});
 
     this.channel
         .join()

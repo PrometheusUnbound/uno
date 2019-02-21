@@ -17,6 +17,7 @@ defmodule UnogameWeb.GamesChannel do
         socket = socket
         |> assign(:game, game)
         |> assign(:name, name)
+        |> assign(:playerid, playerid)
       
         BackupAgent.put(name, game)
 
@@ -28,6 +29,18 @@ defmodule UnogameWeb.GamesChannel do
     else
       {:error, %{reason: "unauthorized"}}
     end
+  end
+
+  def terminate(reason, socket) do
+    playerid = socket.assigns[:playerid]
+    name = socket.assigns[:name]
+    game = BackupAgent.get(name)
+    |> Game.leave_game(playerid)
+    BackupAgent.put(name, game)
+    broadcast(socket, "update_game", %{})
+    {:noreply, socket}
+    IO.puts("terminating...")
+    IO.puts(playerid)
   end
 
   def handle_info(:game_ready, socket) do

@@ -28,7 +28,6 @@ defmodule Unogame.Game do
     |> Enum.concat(yellow_cards)
     |> Enum.concat(special_cards)
     |> Enum.shuffle
-   
   end
 
   # cards are in the format of [color, value]
@@ -51,17 +50,21 @@ defmodule Unogame.Game do
     }
   end
   def client_view(game, playerid) do
-    %{
-      num_players: length(game.player_ids),
-      face_up_card: (hd game.discard_pile),
-      has_game_started: game_started?(game),
-      player_hand: game.player_hands[playerid],
-      deck: game.deck, # TODO remove
-      discard_pile: game.discard_pile, # TODO replace with top card in discard_pile,
-      player_hands: game.player_hands,
-      current_player_ind: game.next_player_ind, # TODO remove
-      player_ids: game.player_ids # TODO remove
-    }
+    if game_started?(game) do
+      %{
+        num_players: length(game.player_ids),
+        face_up_card: (hd game.discard_pile),
+        has_game_started: game_started?(game),
+        player_hand: game.player_hands[playerid],
+        deck: game.deck, # TODO remove
+        discard_pile: game.discard_pile, # TODO replace with top card in discard_pile,
+        player_hands: game.player_hands,
+        current_player_ind: game.next_player_ind, # TODO remove
+        player_ids: game.player_ids # TODO remove
+      }
+    else
+      client_view(game)
+    end
   end
 
   # add playerid to the given game
@@ -72,6 +75,30 @@ defmodule Unogame.Game do
       |> Map.put(:player_ids, [playerid | game.player_ids])
     else
       game
+    end
+  end
+
+  # remove playerid from the given game
+  def leave_game(game, playerid) do
+    IO.puts("leave game")
+    
+    if length(game.player_ids) == 1 do
+      # everyone has left the game
+      nil
+    else
+      player_ind = Enum.find_index(game.player_ids, fn pid -> pid == playerid end)
+    
+      new_next_player_ind = 
+        if game_started?(game) && (player_ind - game.next_player_ind < 0) do
+          next_player_ind(game)
+        else
+          game.next_player_ind
+        end    
+
+      game = game
+      |> Map.put(:player_ids, List.delete(game.player_ids, playerid))
+      |> Map.put(:player_hands, Map.delete(game.player_hands, playerid)) 
+      |> Map.put(:next_player_ind, new_next_player_ind)
     end
   end
 
