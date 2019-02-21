@@ -74,6 +74,20 @@ defmodule Unogame.Game do
     length(game.player_ids) >= min_num_players 
   end
 
+  defp move_card_from_deck_to_pile(game) do
+    if game.deck == [] do
+      game
+      |> discard_pile_to_deck
+      |> move_card_from_deck_to_pile
+    else
+      [top_card | new_deck] = game.deck
+      new_discard_pile = [top_card | game.discard_pile]
+      game
+      |> Map.put(:deck, new_deck)
+      |> Map.put(:discard_pile, new_discard_pile)
+    end
+  end
+
   defp deal_cards(game, []), do: game
   defp deal_cards(game, player_ids) do
     [head | tail] = player_ids
@@ -93,6 +107,7 @@ defmodule Unogame.Game do
         
     game
     |> deal_cards(game.player_ids)
+    |> move_card_from_deck_to_pile
   end
 
   defp next_player_ind(game) do
