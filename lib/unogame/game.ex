@@ -44,9 +44,9 @@ defmodule Unogame.Game do
     }
   end
 
-  # TODO pass in player id here?
   def client_view(game) do
     %{
+      has_game_started: game_started?(game),
       num_players: length(game.player_ids)
     }
   end
@@ -54,6 +54,7 @@ defmodule Unogame.Game do
     %{
       num_players: length(game.player_ids),
       face_up_card: (hd game.discard_pile),
+      has_game_started: game_started?(game),
       player_hand: game.player_hands[playerid],
       deck: game.deck, # TODO remove
       discard_pile: game.discard_pile, # TODO replace with top card in discard_pile,
