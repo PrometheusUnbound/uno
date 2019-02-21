@@ -19,12 +19,13 @@ import socket from "./socket"
 import game_init from "./uno-game";
 
 // Now that you are connected, you can join channels with a topic:
-let channel = socket.channel("games:subtopic", {});
+let playerid = Math.floor(Math.random() * 10000)
+let channel = socket.channel("games:" + window.gameName, {"playerid": playerid});
 
 $(() => {
   let root = $('#root')[0];
   if (root) {
-    game_init(root, channel)
+    game_init(root, channel, playerid)
   }
 });
 

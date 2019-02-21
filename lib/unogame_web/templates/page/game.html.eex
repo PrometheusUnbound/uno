@@ -1,6 +1,10 @@
+<script>
+  window.gameName = "<%= @name %>";
+</script>
+
 <div class="row">
   <div class="column">
-    <h2>Uno</h2>
+    <h2>Uno: <%= @name %></h2>
     <div id="root">
       React app loading...
     </div>

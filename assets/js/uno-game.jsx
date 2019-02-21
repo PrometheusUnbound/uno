@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import _ from "lodash";
 
 //Export default/channel set up
-export default function game_init(root, channel) {
-  ReactDOM.render(<UnoGame channel={channel} />, root);
+export default function game_init(root, channel, playerid) {
+  ReactDOM.render(<UnoGame channel={channel} playerid={playerid} />, root);
 }
 
 class UnoGame extends React.Component {
@@ -17,12 +17,29 @@ class UnoGame extends React.Component {
       face_up: [],
     }
 
-  this.channel = props.channel;
+    this.channel = props.channel;
 
-  this.channel
-      .join()
-      .receive("ok", resp => { console.log("Joined successfully", resp) })
-      .receive("error", resp => { console.log("Unable to join", resp) });
+    this.playerid = props.playerid; 
+    console.log("playerid: " + this.playerid);
+
+    this.channel.on("game_ready", payload => {this.getGame()});
+    this.channel.on("game_over", payload => {this.gameOver()});
+
+    this.channel
+        .join()
+        .receive("ok", this.set_view.bind(this))
+        .receive("error", resp => { console.log("Unable to join", resp) });
+  }
+
+  getGame() {
+    this.channel.push("get_game", {})
+      .receive("ok", (resp) => { this.setState(resp.game);
+      console.log("get_game...");
+      console.log(resp.game); });
+  }
+
+  gameOver() {
+    alert("game over");
   }
 
   got_view(view) {
@@ -46,7 +63,7 @@ class UnoGame extends React.Component {
       .recieve("ok", this.got_view.bind(this))
   }
 
-  creatHand(){
+  createHand(){
     let table = [];
     for(let i = 0; j < 1; j++){
       let children = [];
@@ -57,9 +74,6 @@ class UnoGame extends React.Component {
     }
     return table;
   }
-
-
-
 
   render() {
     let uno_button = <button className="button uno" onClick={() => this.on_uno()}>
@@ -80,8 +94,41 @@ class UnoGame extends React.Component {
                       onClick={() => this.on_draw.bind(this)} />
           </div>
         </div>
+        <div>
+          <h1>Hello World</h1>
+          <button onClick={this.drawCard.bind(this)}>Draw</button>
+          <button onClick={this.playCard.bind(this)}>Play card</button>
+        </div>
+
       </div>
     )
+ }
+ 
+  set_view(view) {
+    console.log("Joined successfully");
+    console.log(view.game);
+    this.setState(view.game);
+  }
+
+  drawCard() {
+    this.channel.push("draw_card", { playerid: this.playerid })
+        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
+        .receive("error", resp => { console.log("Unable to draw card", resp) }); 
+  }
+
+  playCard() {
+    let card = this.state.player_hands[this.playerid][0];
+    this.channel.push("play_card", { playerid: this.playerid, card: card})
+        .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
+        .receive("error", resp => { console.log("Unable to play card", resp) }); 
+  }
+
+  render2() {
+    return <div>
+        <h1>Hello World</h1>
+        <button onClick={this.drawCard.bind(this)}>Draw</button>
+        <button onClick={this.playCard.bind(this)}>Play card</button>
+      </div>
   }
 }
 

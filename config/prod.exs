@@ -10,8 +10,11 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :unogame, UnogameWeb.Endpoint,
-  http: [:inet6, port: System.get_env("PORT") || 4000],
-  url: [host: "example.com", port: 80],
+  server: true,
+  root: ".",
+  version: Application.spec(:phoenix_distillery, :vsn),
+  http: [:inet6, port: {:system, "PORT"}],
+  url: [host: "uno.notbreaking.xyz", port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
@@ -68,4 +71,21 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs which should be versioned
 # separately.
-import_config "prod.secret.exs"
+
+# In this file, we keep production configuration that
+# you'll likely want to automate and keep away from
+# your version control system.
+#
+# You should document the content of this
+# file or create a script for recreating it, since it's
+# kept out of version control and might be hard to recover
+# or recreate for your teammates (or yourself later on).
+path = Path.expand("~/.config/unogame.secret")
+unless File.exists?(path) do
+  secret = Base.encode16(:crypto.strong_rand_bytes(32))
+  File.write!(path, secret)
+end
+secret = File.read!(path)
+
+config :unogame, UnogameWeb.Endpoint,
+  secret_key_base: secret
