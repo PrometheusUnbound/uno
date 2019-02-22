@@ -57,6 +57,7 @@ defmodule Unogame.Game do
         face_up_card: (hd game.discard_pile),
         has_game_started: game_started?(game),
         player_hand: game.player_hands[playerid],
+        opponent_cards: opponent_cards(game, playerid),
         deck: game.deck, # TODO remove
         discard_pile: game.discard_pile, # TODO replace with top card in discard_pile,
         player_hands: game.player_hands,
@@ -118,6 +119,18 @@ defmodule Unogame.Game do
   def is_ready?(game) do
     min_num_players = 4
     length(game.player_ids) >= min_num_players
+  end
+
+  defp opponent_cards(game, [], opponentmap), do: opponentmap
+  defp opponent_cards(game, opponentids, opponentmap) do
+    [oid | other_ids] = opponentids
+    hand_length = length(Map.get(game.player_hands, oid))
+    opponent_cards(game, other_ids, Map.put(opponentmap, oid, hand_length))
+  end
+  # map of {opponentid: number_of_cards}
+  defp opponent_cards(game, playerid) do
+    opponent_ids = List.delete(game.player_ids, playerid)
+    opponent_cards(game, opponent_ids, %{})
   end
 
   defp move_card_from_deck_to_pile(game) do

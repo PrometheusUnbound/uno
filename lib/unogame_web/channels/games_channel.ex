@@ -31,7 +31,7 @@ defmodule UnogameWeb.GamesChannel do
     end
   end
 
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     playerid = socket.assigns[:playerid]
     name = socket.assigns[:name]
     game = BackupAgent.get(name)
@@ -65,6 +65,7 @@ defmodule UnogameWeb.GamesChannel do
       socket = socket
       |> assign(:game, game)
       BackupAgent.put(name, game)
+      broadcast(socket, "update_game", %{})
       {:reply, {:ok, %{"game" => Game.client_view(game, playerid)}}, socket}
     rescue
       e in ArgumentError -> {:reply, {:error, %{reason: e.message}}, socket}
@@ -78,6 +79,7 @@ defmodule UnogameWeb.GamesChannel do
       socket = socket
       |> assign(:game, game)
       BackupAgent.put(name, game)
+      broadcast(socket, "update_game", %{})
 
       if Game.game_over?(game) do
         IO.puts("game over")
