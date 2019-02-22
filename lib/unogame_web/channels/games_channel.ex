@@ -18,7 +18,7 @@ defmodule UnogameWeb.GamesChannel do
         |> assign(:game, game)
         |> assign(:name, name)
         |> assign(:playerid, playerid)
-      
+
         BackupAgent.put(name, game)
 
         if Game.is_ready?(game) do
@@ -86,6 +86,20 @@ defmodule UnogameWeb.GamesChannel do
         BackupAgent.put(name, nil) # clear game from BackupAgent
         broadcast(socket, "game_over", %{})
       end
+      {:reply, {:ok, %{"game" => Game.client_view(game, playerid)}}, socket}
+    rescue
+      e in ArgumentError -> {:reply, {:error, %{reason: e.message}}, socket}
+    end
+  end
+
+  def handle_in("uno?", %{"playerid" => playerid}, socket) do
+    try do
+      name = socket.assigns[:name]
+      game = Game.uno_call(BackupAgent.get(name), playerid)
+      socket = socket
+      |> assign(:game, game)
+      BackupAgent.put(name, game)
+      broadcast(socket, "update_game", %{})
       {:reply, {:ok, %{"game" => Game.client_view(game, playerid)}}, socket}
     rescue
       e in ArgumentError -> {:reply, {:error, %{reason: e.message}}, socket}

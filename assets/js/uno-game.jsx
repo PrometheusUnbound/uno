@@ -19,7 +19,7 @@ class UnoGame extends React.Component {
 
     this.channel = props.channel;
 
-    this.playerid = props.playerid; 
+    this.playerid = props.playerid;
     console.log("playerid: " + this.playerid);
 
     this.channel.on("game_ready", payload => {this.getGame()});
@@ -60,18 +60,18 @@ class UnoGame extends React.Component {
     console.log(ev);
     this.channel.push("draw_card", { playerid: this.playerid })
         .receive("ok", (resp) => { this.got_view(resp); console.log(resp.game); })
-        .receive("error", resp => { console.log("Unable to draw card", resp) }); 
+        .receive("error", resp => { console.log("Unable to draw card", resp) });
   }
 
   on_uno(){
-    this.channel.push("uno?", { hand: hand })
+    this.channel.push("uno?", { playerid: this.playerid })
       .recieve("ok", this.got_view.bind(this))
   }
 
   playCard(card) {
     this.channel.push("play_card", { playerid: this.playerid, card: card})
         .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
-        .receive("error", resp => { console.log("Unable to play card", resp) }); 
+        .receive("error", resp => { console.log("Unable to play card", resp) });
   }
 
   renderWaiting() {
@@ -80,13 +80,13 @@ class UnoGame extends React.Component {
       </div>);
   }
 
-  renderGameAlreadyInProgress() {   
+  renderGameAlreadyInProgress() {
     return (<div>
         <h3>Game is already in progress...</h3>
         <br />
         <a href="/">Go back</a>
       </div>);
-  }    
+  }
 
   createOpponentHands() {
     let opponentHands = [];
@@ -105,7 +105,7 @@ class UnoGame extends React.Component {
       </div>);
 
   }
-       
+
   createHand() {
     let hand = [];
     for (let i = 0; i < this.state.player_hand.length; i++) {
@@ -119,7 +119,7 @@ class UnoGame extends React.Component {
         <div className="row">
           {hand}
         </div>
-      </div>); 
+      </div>);
   }
 
   render() {
@@ -156,7 +156,7 @@ class UnoGame extends React.Component {
       </div>
     )
   }
- 
+
 }
 
 function Face(params) {

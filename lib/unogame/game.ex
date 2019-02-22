@@ -277,6 +277,19 @@ defmodule Unogame.Game do
     |> Map.put(:player_hands, new_player_hands)
     |> Map.put(:discard_pile, new_pile)
   end
+
+  def uno_call(game, playerid) do
+    if Enum.count(game.player_hands[playerid]) == 2 do
+      IO.puts("Valid call...")
+      game
+    end
+    if Enum.count(game.player_hands[playerid]) > 2 do
+      game = game
+      |> draw_card_to_hand(playerid)
+      |> draw_card_to_hand(playerid)
+      |> next_turn
+    end
+  end
   # for now, do not allow cards to stack (eg: deflecting draw-2 with draw-2)
   def play_card(game, playerid, card) do
     if !player_turn?(game, playerid) ||

@@ -43,8 +43,14 @@ defmodule Unogame.GameServer do
     {:reply, game, game}
   end
 
-  def handle_call({:draw_card, name, playerid, card}, _from, game) do
+  def handle_call({:play_card, name, playerid, card}, _from, game) do
     game = Unogame.Game.draw_card(game, playerid, card)
+    Unogame.BackupAgent.put(name, game)
+    {:reply, game, game}
+  end
+
+  def handle_call({:uno_call, name, playerid}, _from, game) do
+    game = Unogame.Game.uno_call(game, playerid)
     Unogame.BackupAgent.put(name, game)
     {:reply, game, game}
   end
