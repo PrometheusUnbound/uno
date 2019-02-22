@@ -12,7 +12,7 @@ defmodule Unogame.GameServer do
       restart: :permanent,
       type: :worker,
     }
-    Hangman.GameSup.start_child(spec)
+    Unogame.GameSup.start_child(spec)
   end
 
   def start_link(name) do
@@ -43,8 +43,8 @@ defmodule Unogame.GameServer do
     {:reply, game, game}
   end
 
-  def handle_call({:draw_card, name, playerid, card}, _from, game) do
-    game = Unogame.Game.draw_card(game, playerid, card)
+  def handle_call({:play_card, name, playerid, card}, _from, game) do
+    game = Unogame.Game.play_card(game, playerid, card)
     Unogame.BackupAgent.put(name, game)
     {:reply, game, game}
   end
