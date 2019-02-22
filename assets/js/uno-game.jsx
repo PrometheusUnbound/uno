@@ -69,7 +69,6 @@ class UnoGame extends React.Component {
   }
 
   playCard(card) {
-    //let card = this.state.player_hands[this.playerid][0];
     this.channel.push("play_card", { playerid: this.playerid, card: card})
         .receive("ok", (resp) => { this.setState(resp.game); console.log(resp.game); })
         .receive("error", resp => { console.log("Unable to play card", resp) }); 
@@ -88,26 +87,33 @@ class UnoGame extends React.Component {
         <a href="/">Go back</a>
       </div>);
   }    
+
+  createOpponentHands() {
+    let opponentHands = [];
+    let keys = Object.keys(this.state.opponent_cards);
+    for (let i = 0; i < keys.length; i++) {
+      let opponentId = keys[i];
+      let numCardsLeft = this.state.opponent_cards[opponentId];
+      opponentHands.push(<OpponentHand className="column opponent-hand" opponentid={opponentId} count={numCardsLeft} />);
+    }
+    return (<div className="opponent-hands">
+        <b>Your opponents:</b>
+        <br />
+        <div className="row">
+          {opponentHands}
+        </div>
+      </div>);
+
+  }
        
   createHand() {
-/*    let table = [];
-    for(let i = 0; j < 1; j++){
-      let children = [];
-      for(let j = 0; i < hand.length; j++) {
-        children.push(<td>{'${hand[j][0] + " " + hand[j][1]'}</td>);
-      }
-      table.push(<tr>{children}</tr>);
-    }
-    return table;*/
-
     let hand = [];
     for (let i = 0; i < this.state.player_hand.length; i++) {
-      console.log("render card...");
       let card = this.state.player_hand[i];
       hand.push(<Card className="column card-hand" color={card[0]} value={card[1]} onClick={() => {this.playCard(card)}} />);
     }
 
-    return (<div className="hand">
+    return (<div className="player-hand">
         <b>Your hand:</b>
         <br />
         <div className="row">
@@ -125,6 +131,7 @@ class UnoGame extends React.Component {
     }
 
     let hand = this.createHand();
+    let opponentHands = this.createOpponentHands();
     let faceUp = this.state.face_up_card.length != 0 ? <Card className="faceup" color={this.state.face_up_card[0]} value={this.state.face_up_card[1]} /> : [];
     let uno_button = <button className="button uno" onClick={() => this.on_uno()}>
                       UNO!</button>
@@ -132,16 +139,17 @@ class UnoGame extends React.Component {
       <div>
         <div className="row">
           <div className="column">
-            {uno_button}
-          </div>
-        </div>
-        <div className="row">
-          <div className="column">
             {faceUp}
           </div>
           <div className="column">
             <img id="deck" src='/images/UNO-Back.png'
                       onClick={this.on_draw.bind(this)} />
+          </div>
+        </div>
+        {opponentHands}
+        <div className="row">
+          <div className="column">
+            {uno_button}
           </div>
         </div>
         {hand}
@@ -161,7 +169,13 @@ function Face(params) {
 }
 
 const Card = function(props) {
-  return <div className={props.className} onClick={props.onClick}>
-      {props.color + " " + props.value}
-    </div>
+  return (<div className={props.className} onClick={props.onClick}>
+      <p>{props.color + " " + props.value}</p>
+    </div>);
+}
+
+const OpponentHand = function(props) {
+  return (<div className={props.className}>
+      <p><i>Player {props.opponentid + ": " + props.count}</i> cards left</p>
+    </div>);
 }
