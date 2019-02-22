@@ -56,6 +56,7 @@ defmodule Unogame.Game do
         num_players: length(game.player_ids),
         face_up_card: (hd game.discard_pile),
         has_game_started: game_started?(game),
+        is_player_turn: Enum.at(game.player_ids, game.next_player_ind) == playerid,
         player_hand: game.player_hands[playerid],
         opponent_cards: opponent_cards(game, playerid),
         deck: game.deck, # TODO remove
@@ -97,7 +98,7 @@ defmodule Unogame.Game do
           game.next_player_ind
         end
 
-      game = game
+      game
       |> Map.put(:player_ids, List.delete(game.player_ids, playerid))
       |> Map.put(:player_hands, Map.delete(game.player_hands, playerid))
       |> Map.put(:next_player_ind, new_next_player_ind)
@@ -121,7 +122,7 @@ defmodule Unogame.Game do
     length(game.player_ids) >= min_num_players
   end
 
-  defp opponent_cards(game, [], opponentmap), do: opponentmap
+  defp opponent_cards(_game, [], opponentmap), do: opponentmap
   defp opponent_cards(game, opponentids, opponentmap) do
     [oid | other_ids] = opponentids
     hand_length = length(Map.get(game.player_hands, oid))
@@ -245,8 +246,6 @@ defmodule Unogame.Game do
 
   # may be unnecessary? the card should already have the color updated? (eg: [blue, wild])
   defp wild_played(game, playerid, card) do
-    # TODO
-
     game
   end
 
