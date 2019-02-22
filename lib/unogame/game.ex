@@ -206,9 +206,9 @@ defmodule Unogame.Game do
   # for now, do not allow cards to stack (eg: deflecting draw-2 with draw-2)
   def play_card(game, playerid, card) do
     if !player_turn?(game, playerid) ||
-    ((Enum.at(game.card, 0) != Enum.at(Enum.at(game.discard_pile, 0), 0)) &&
-      (Enum.at(game.card, 1) != Enum.at(Enum.at(game.discard_pile, 0), 1)) &&
-      (Enum.at(game.card, 0) != "wild")) do
+    ((Enum.at(card, 0) != Enum.at(Enum.at(game.discard_pile, 0), 0)) &&
+      (Enum.at(card, 1) != Enum.at(Enum.at(game.discard_pile, 0), 1)) &&
+      (Enum.at(card, 0) != "wild")) do
       IO.puts("not your turn...")
       raise ArgumentError, message: "not turn of player " <> Integer.to_string(playerid)
       game
