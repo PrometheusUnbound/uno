@@ -210,7 +210,8 @@ defmodule Unogame.Game do
       raise ArgumentError, message: "not turn of player " <> Integer.to_string(playerid)
       game
     if (Enum.at(card, 0) != Enum.at(Enum.at(discard_pile, 0), 0) &&
-      (Enum.at(card, 1) != Enum.at(Enum.at(discard_pile, 0), 1) do
+      (Enum.at(card, 1) != Enum.at(Enum.at(discard_pile, 0), 1) &&
+      (Enum.at(card, 0 != "wild") do
       IO.puts("illegal play.. ")
       raise ArgumentError, message: "Illegal Play" <> Integer.to_string(playerid)
       game
