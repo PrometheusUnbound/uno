@@ -1,10 +1,10 @@
 defmodule Unogame.Game do
 
-  defp gen_color_cards(color) do 
+  defp gen_color_cards(color) do
     # from Uno wiki: each color consists of one 0, two of each 1-9, two of each 'skip', 'draw-2', and 'reverse'
     vals_to_dup = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "skip", "reverse", "draw-2"]
     possible_values = ["0" | Enum.concat(vals_to_dup, vals_to_dup)]
-    
+
     Enum.map(possible_values, fn val -> [color, val] end)
   end
 
@@ -28,7 +28,7 @@ defmodule Unogame.Game do
     |> Enum.concat(yellow_cards)
     |> Enum.concat(special_cards)
     |> Enum.shuffle
-   
+
   end
 
   # cards are in the format of [color, value]
@@ -40,7 +40,7 @@ defmodule Unogame.Game do
       next_player_ind: 0,
       num_players: 0,
       player_hands: %{},
-      player_ids: [], 
+      player_ids: [],
       deck: gen_all_cards()
     }
   end
@@ -61,7 +61,7 @@ defmodule Unogame.Game do
   def join_game(game, playerid) do
     IO.puts("join game")
     if not Enum.member?(game.player_ids, playerid) do
-      game 
+      game
       |> Map.put(:player_ids, [playerid | game.player_ids])
     else
       game
@@ -71,7 +71,7 @@ defmodule Unogame.Game do
   # are there enough players to start the game?
   def is_ready?(game) do
     min_num_players = 4
-    length(game.player_ids) >= min_num_players 
+    length(game.player_ids) >= min_num_players
   end
 
   defp deal_cards(game, []), do: game
@@ -85,12 +85,12 @@ defmodule Unogame.Game do
     game = game
     |> Map.put(:deck, new_deck)
     |> Map.put(:player_hands, new_player_hands)
- 
+
     deal_cards(game, tail)
-  end 
+  end
   def deal_cards(game) do
     IO.puts("dealing cards...") # TODO delete
-        
+
     game
     |> deal_cards(game.player_ids)
   end
@@ -105,7 +105,7 @@ defmodule Unogame.Game do
 
   defp next_turn(game) do
     IO.puts("to next player...")
-    
+
     game
     |> Map.put(:next_player_ind, next_player_ind(game))
   end
@@ -152,7 +152,7 @@ defmodule Unogame.Game do
 
   defp draw_two_played(game, playerid) do
     next_player_ind = next_player_ind(game)
-    next_player_id = Enum.at(game.player_ids, next_player_ind)   
+    next_player_id = Enum.at(game.player_ids, next_player_ind)
 
     game
     |> draw_card_to_hand(next_player_id)
@@ -171,7 +171,7 @@ defmodule Unogame.Game do
 
   # may be unnecessary? the card should already have the color updated? (eg: [blue, wild])
   defp wild_played(game, playerid, card) do
-    # TODO  
+    # TODO
 
     game
   end
@@ -185,7 +185,7 @@ defmodule Unogame.Game do
     |> draw_card_to_hand(next_player_id)
     |> draw_card_to_hand(next_player_id)
     |> draw_card_to_hand(next_player_id)
-    |> wild_played(playerid, card) 
+    |> wild_played(playerid, card)
   end
 
   defp move_from_hand_to_pile(game, playerid, card) do
@@ -193,7 +193,7 @@ defmodule Unogame.Game do
     player_hand = Map.get(game.player_hands, playerid)
     new_player_hand = player_hand
     |> List.delete(card)
-  
+
     new_player_hands = game.player_hands
     |> Map.put(playerid, new_player_hand)
 
@@ -209,7 +209,12 @@ defmodule Unogame.Game do
       IO.puts("not your turn...")
       raise ArgumentError, message: "not turn of player " <> Integer.to_string(playerid)
       game
-    else 
+    if (Enum.at(card, 0) != Enum.at(Enum.at(discard_pile, 0), 0) &&
+      (Enum.at(card, 1) != Enum.at(Enum.at(discard_pile, 0), 1) do
+      IO.puts("illegal play.. ")
+      raise ArgumentError, message: "Illegal Play" <> Integer.to_string(playerid)
+      game
+    else
       game = game
       |> move_from_hand_to_pile(playerid, card)
 
