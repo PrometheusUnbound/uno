@@ -39,8 +39,7 @@ defmodule Unogame.Game do
       discard_pile: [],
       next_player_ind: 0,
       player_hands: %{},
-      player_ids: [],
-      deck: gen_all_cards()
+      player_ids: []
     }
   end
 
@@ -58,12 +57,7 @@ defmodule Unogame.Game do
         has_game_started: game_started?(game),
         is_player_turn: Enum.at(game.player_ids, game.next_player_ind) == playerid,
         player_hand: game.player_hands[playerid],
-        opponent_cards: opponent_cards(game, playerid),
-        deck: game.deck, # TODO remove
-        discard_pile: game.discard_pile, # TODO replace with top card in discard_pile,
-        player_hands: game.player_hands,
-        current_player_ind: game.next_player_ind, # TODO remove
-        player_ids: game.player_ids # TODO remove
+        opponent_cards: opponent_cards(game, playerid)
       }
     else
       client_view(game)
@@ -225,7 +219,7 @@ defmodule Unogame.Game do
     end
   end
 
-  defp draw_two_played(game, playerid) do
+  defp draw_two_played(game, _playerid) do
     next_player_ind = next_player_ind(game)
     next_player_id = Enum.at(game.player_ids, next_player_ind)
 
@@ -245,7 +239,7 @@ defmodule Unogame.Game do
   end
 
   # may be unnecessary? the card should already have the color updated? (eg: [blue, wild])
-  defp wild_played(game, playerid, card) do
+  defp wild_played(game, _playerid, _card) do
     game
   end
 

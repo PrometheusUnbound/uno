@@ -35,7 +35,6 @@ class UnoGame extends React.Component {
   getGame() {
     this.channel.push("get_game", { playerid: this.playerid })
       .receive("ok", (resp) => { this.setState(resp.game);
-      console.log("get_game...");
       console.log(resp.game); });
   }
 
@@ -45,7 +44,6 @@ class UnoGame extends React.Component {
 
   got_view(view) {
     console.log("new view", view);
-    console.log("Joined successfully");
     console.log(view.game);
     this.setState(view.game);
   }
@@ -131,7 +129,6 @@ class UnoGame extends React.Component {
   }
 
   render() {
-
     if (this.isGameAlreadyInProgress) {
       return this.renderGameAlreadyInProgress();
     } else if (!this.state.has_game_started) {
@@ -167,15 +164,6 @@ class UnoGame extends React.Component {
     )
   }
  
-}
-
-function Face(params) {
-  let {face} = params;
-  return (
-    <div>
-      <p><b>The Deck</b></p>
-    </div>
-  );
 }
 
 const Card = function(props) {

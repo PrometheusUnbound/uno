@@ -39,8 +39,6 @@ defmodule UnogameWeb.GamesChannel do
     BackupAgent.put(name, game)
     broadcast(socket, "update_game", %{})
     {:noreply, socket}
-    IO.puts("terminating...")
-    IO.puts(playerid)
   end
 
   def handle_info(:game_ready, socket) do
@@ -52,7 +50,6 @@ defmodule UnogameWeb.GamesChannel do
     {:noreply, socket}
   end
 
-  # TODO handle input
   def handle_in("get_game", %{"playerid" => playerid}, socket) do
     name = socket.assigns[:name]
     game = BackupAgent.get(name)
