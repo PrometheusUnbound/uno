@@ -122,6 +122,14 @@ class UnoGame extends React.Component {
       </div>); 
   }
 
+  createTurnText() {
+    if (this.state.is_player_turn) {
+      return (<p>Your Turn!</p>);
+    } else {
+      return (<p>Opponent Turn</p>);
+    }
+  }
+
   render() {
 
     if (this.isGameAlreadyInProgress) {
@@ -130,6 +138,7 @@ class UnoGame extends React.Component {
       return this.renderWaiting();
     }
 
+    let turnText = <div>{this.createTurnText()}</div>
     let hand = this.createHand();
     let opponentHands = this.createOpponentHands();
     let faceUp = this.state.face_up_card.length != 0 ? <Card className="faceup" color={this.state.face_up_card[0]} value={this.state.face_up_card[1]} /> : [];
@@ -137,6 +146,7 @@ class UnoGame extends React.Component {
                       UNO!</button>
     return (
       <div>
+        {turnText}
         <div className="row">
           <div className="column">
             {faceUp}
