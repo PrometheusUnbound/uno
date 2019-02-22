@@ -205,15 +205,12 @@ defmodule Unogame.Game do
   end
   # for now, do not allow cards to stack (eg: deflecting draw-2 with draw-2)
   def play_card(game, playerid, card) do
-    if !player_turn?(game, playerid) do
+    if !player_turn?(game, playerid) ||
+    ((Enum.at(game.card, 0) != Enum.at(Enum.at(game.discard_pile, 0), 0)) &&
+      (Enum.at(game.card, 1) != Enum.at(Enum.at(game.discard_pile, 0), 1)) &&
+      (Enum.at(game.card, 0) != "wild")) do
       IO.puts("not your turn...")
       raise ArgumentError, message: "not turn of player " <> Integer.to_string(playerid)
-      game
-    if (Enum.at(card, 0) != Enum.at(Enum.at(discard_pile, 0), 0) &&
-      (Enum.at(card, 1) != Enum.at(Enum.at(discard_pile, 0), 1) &&
-      (Enum.at(card, 0 != "wild") do
-      IO.puts("illegal play.. ")
-      raise ArgumentError, message: "Illegal Play" <> Integer.to_string(playerid)
       game
     else
       game = game
@@ -227,8 +224,8 @@ defmodule Unogame.Game do
         "wild" -> wild_played(game, playerid, card) |> next_turn
         _ -> game |> next_turn
       end
-      # TODO handle last card -- game over? or player no longer active
     end
   end
+      # TODO handle last card -- game over? or player no longer active
 
 end

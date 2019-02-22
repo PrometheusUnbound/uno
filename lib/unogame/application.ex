@@ -12,7 +12,7 @@ defmodule Unogame.Application do
       UnogameWeb.Endpoint,
       # Starts a worker by calling: Unogame.Worker.start_link(arg)
       # {Unogame.Worker, arg},
-      Unogame.BackupAgent
+      Unogame.BackupAgent,
       Unogame.Gamesup
     ]
 
